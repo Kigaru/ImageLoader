@@ -128,7 +128,7 @@ public class Controller {
         }
     }
     
-    public void showAllChannels() {
+    private void showAllChannels() {
         long timeStart = System.currentTimeMillis();
         if (graphics!=null) {
             Stage channels = new Stage();
