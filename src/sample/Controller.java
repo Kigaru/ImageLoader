@@ -179,30 +179,89 @@ public class Controller {
 
 
     public void test() {
-        if(graphics!=null) {
+        if (graphics != null) {
 
             //STEP 1: initialize
             PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
 
             //STEP 2: populate
-                for (int i = 0; i < pixelCollection.getPixels().length; i++) {
-                    pixelCollection.setPixel(i,i);
-                }
+            for (int i = 0; i < pixelCollection.getPixels().length; i++) {
+                pixelCollection.setPixel(i, i);
+            }
 
             //STEP 3: saturate image accordingly
-            WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true,true);
+            WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true, true);
             image.setImage(saturatedImage);
+
+
+
+            int totalPixels = pixelCollection.getPixels().length;
 
             //STEP 4: set all white pixels to -1
             for (int j = 0; j < graphics.getHeight(); j++) {
                 for (int i = 0; i < graphics.getWidth(); i++) {
-                    if (saturatedImage.getPixelReader().getColor(i,j).equals(Color.WHITE)) {
-                        pixelCollection.setPixel(i + j * (int)graphics.getWidth(),-1);
+                    if (saturatedImage.getPixelReader().getColor(i, j).equals(Color.WHITE)) {
+                        pixelCollection.setPixel(i + j * (int) graphics.getWidth(), -1);
+                        totalPixels--;
                     }
                 }
             }
 
             //STEP 5: union all black pixels
+            for (int j = 0; j < graphics.getHeight(); j++) {
+                for (int i = 0; i < graphics.getWidth(); i++) {
+                    if (pixelCollection.getPixels()[i + j * (int) graphics.getWidth()] != -1) {
+                        if (!(i + 1 >= graphics.getWidth()) || !(j + 1 >= graphics.getHeight())) {
+                            //to the right
+                            if (saturatedImage.getPixelReader().getColor(i + 1, j).equals(Color.BLACK)) {
+                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + 1 + j * (int) graphics.getWidth());
+                            }
+                            //directly under
+                            if (saturatedImage.getPixelReader().getColor(i, j + 1).equals(Color.BLACK)) {
+                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+                            }
+                            //under right
+                            if (saturatedImage.getPixelReader().getColor(i +1, j + 1).equals(Color.BLACK)) {
+                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i +1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+                            }
+                        }
+                        if(i-1 != -1) {
+                            //under left
+                            if (saturatedImage.getPixelReader().getColor(-1 +i, j +1).equals(Color.BLACK)) {
+                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i - 1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+                            }
+                        }
+                    }
+                }
+            }
+
+            //STEP 6: count all roots
+            int[] roots = new int[100];
+            for (int i = 0; i < roots.length; i++) {
+                roots[i] = -213;
+            }
+            int counter = 0;
+            for (int j = 0; j < pixelCollection.getPixels().length; j++) { //going thru all pixels
+                if(pixelCollection.getPixels()[j] >= 0) { //if black pixel
+                    boolean isNewRoot = true;
+                    for (int i = 0; i < roots.length ; i++) {
+                        if(roots[i] == DisjointSet.find(pixelCollection.getPixels(),j)) isNewRoot = false;
+
+                    }
+                    if(isNewRoot) {
+                        roots[counter] = DisjointSet.find(pixelCollection.getPixels(),j);
+                        System.out.println("x: "+ j%graphics.getWidth() + ", y: " + (j-j%graphics.getWidth())/graphics.getWidth());
+                        System.out.println(j);
+                        counter++;
+                    }
+                }
+            }
+
+            //STEP 7: noise reduction
+            //??
+
+            System.out.println("there are " + totalPixels + " black pixels");
+            System.out.println("there are " + counter+ " birds");
 
 //            //STEP 4: verify (again)
 //            //there should be 788 white pixels in text image
@@ -217,7 +276,7 @@ public class Controller {
         }
     }
 
-    public void fileInfo() throws IOException {
+        public void fileInfo() throws IOException {
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("info.fxml"));
         Parent root = loader.load();

@@ -12,7 +12,7 @@ public class PixelCollection {
         return pixels;
     }
 
-    public void setPixel(int index, int data) {
-        pixels[index] = data;
+    public void setPixel(int index, int parent) {
+        pixels[index] = parent;
     }
 }
