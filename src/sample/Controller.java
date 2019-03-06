@@ -51,7 +51,6 @@ public class Controller {
     }
 
     public void toggleMonochrome() {
-        long before = System.nanoTime();
         if(graphics!=null) {
             if (!isMonochrome) {                
                 isMonochrome = true;
@@ -69,21 +68,16 @@ public class Controller {
                 image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome,false));
             }
         }
-        long after = System.nanoTime();
-        System.out.println("The time it took to toggle monochrome = " + (after - before) + " nanoseconds");
     }
 
 
     public void toggleColor() {
-        long before = System.nanoTime();
         isMonochrome = false;
         isRed = redCheck.isSelected();
         isGreen = greenCheck.isSelected();
         isBlue = blueCheck.isSelected();
         fixCheckBoxes();
         image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome,false));
-        long after = System.nanoTime();
-        System.out.println("The time it took to toggle colors = " + (after - before) + " nanoseconds");
     }
 
     private Image getModifiedImage(boolean red, boolean green, boolean blue, boolean mono, boolean explicitMono) {
@@ -95,33 +89,33 @@ public class Controller {
             double dred, dgreen, dblue, dmono;
 
             if(!mono) {
-                for (int y = 0; y < graphics.getWidth(); y++) {
-                    for (int x = 0; x < graphics.getHeight(); x++) {
+                for (int x = 0; x < graphics.getWidth(); x++) {
+                    for (int y = 0; y < graphics.getHeight(); y++) {
 
-                        if (red) dred = graphicsPixelReader.getColor(y, x).getRed();
+                        if (red) dred = graphicsPixelReader.getColor(x, y).getRed();
                         else dred = 0;
 
-                        if (green) dgreen = graphicsPixelReader.getColor(y, x).getGreen();
+                        if (green) dgreen = graphicsPixelReader.getColor(x, y).getGreen();
                         else dgreen = 0;
 
-                        if (blue) dblue = graphicsPixelReader.getColor(y, x).getBlue();
+                        if (blue) dblue = graphicsPixelReader.getColor(x, y).getBlue();
                         else dblue = 0;
 
-                        Color color = new Color(dred, dgreen, dblue, graphicsPixelReader.getColor(y, x).getOpacity());
-                        newImagePixelWriter.setColor(y, x, color);
+                        Color color = new Color(dred, dgreen, dblue, graphicsPixelReader.getColor(x, y).getOpacity());
+                        newImagePixelWriter.setColor(x, y, color);
                     }
                 }
             }
             else {
-                for (int y = 0; y < graphics.getWidth(); y++) {
-                    for (int x = 0; x < graphics.getHeight(); x++) {
-                        Color color = graphicsPixelReader.getColor(y, x);
+                for (int x = 0; x < graphics.getWidth(); x++) {
+                    for (int y = 0; y < graphics.getHeight(); y++) {
+                        Color color = graphicsPixelReader.getColor(x, y);
                         dmono = (color.getRed()+color.getGreen()+color.getBlue())/3;
 
                         if(explicitMono) dmono = dmono > 0.5 ? 1 : 0;
 
                         Color grayscale = new Color(dmono,dmono,dmono,color.getOpacity());
-                        newImagePixelWriter.setColor(y, x, grayscale);
+                        newImagePixelWriter.setColor(x, y, grayscale);
                     }
                 }
             }
@@ -131,9 +125,8 @@ public class Controller {
             return newImage;
         }
     }
-    
-    private void showAllChannels() {
-        long timeStart = System.currentTimeMillis();
+
+    public void showAllChannels() {
         if (graphics!=null) {
             Stage channels = new Stage();
             HBox hbox = new HBox();   
@@ -180,10 +173,8 @@ public class Controller {
             hbox.getChildren().addAll(red,green,blue);
             channels.setScene(new Scene(hbox, width, height));
             channels.setResizable(false);
-            long a = System.currentTimeMillis();
             channels.show();
         }
-        System.out.println("It took: " + ((System.currentTimeMillis() - timeStart)/1000.0) + " seconds to process the image");
     }
 
 
@@ -211,17 +202,18 @@ public class Controller {
                 }
             }
 
-            //STEP 4: verify (again)
-            //there should be 788 white pixels in text image
-            int whitePixel = 0;
-            for (int j = 0; j < graphics.getHeight(); j++) {
-                for (int i = 0; i < graphics.getWidth(); i++) {
-                    if (pixelCollection.getPixels()[i + j*(int)graphics.getWidth()] == -1) {
-                        whitePixel++;
-                    }
-                }
-            }
-            System.out.println("white pixel count: " + whitePixel);
+            //STEP 5: union all black pixels
+
+//            //STEP 4: verify (again)
+//            //there should be 788 white pixels in text image
+//            int whitePixel = 0;
+//            for (int j = 0; j < graphics.getHeight(); j++) {
+//                for (int i = 0; i < graphics.getWidth(); i++) {
+//                    if (pixelCollection.getPixels()[i + j*(int)graphics.getWidth()] == -1) {
+//                        whitePixel++;
+//                    }
+//                }
+//            }
         }
     }
 

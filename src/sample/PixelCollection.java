@@ -15,5 +15,4 @@ public class PixelCollection {
     public void setPixel(int index, int data) {
         pixels[index] = data;
     }
-
 }
