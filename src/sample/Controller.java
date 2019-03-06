@@ -45,7 +45,6 @@ public class Controller {
             fixCheckBoxes();
 
             graphics = new Image(file.toURI().toString());
-            System.out.println(file.toURI().toString());
             graphicsPixelReader = graphics.getPixelReader();
             image.setImage(graphics);
         }
@@ -178,15 +177,43 @@ public class Controller {
             channels.setResizable(false);
             long a = System.currentTimeMillis();
             channels.show();
-            System.out.println("aaaaaaa: " + ((System.currentTimeMillis() - a)/1000.0) + " bbb");
         }
         System.out.println("It took: " + ((System.currentTimeMillis() - timeStart)/1000.0) + " seconds to process the image");
     }
 
 
     public void test() {
+        if(graphics!=null) {
 
-        showAllChannels();
+            //STEP 1: initialize
+            PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
+
+            //STEP 2: populate
+                for (int i = 0; i < pixelCollection.getPixels().length; i++) {
+                    pixelCollection.setPixel(i,i);
+                }
+
+            //STEP 3: set all white pixels to -1
+            for (int j = 0; j < graphics.getHeight(); j++) {
+                for (int i = 0; i < graphics.getWidth(); i++) {
+                    if (graphicsPixelReader.getColor(i,j).equals(Color.WHITE)) {
+                        pixelCollection.setPixel(i + j * (int)graphics.getWidth(),-1);
+                    }
+                }
+            }
+
+            int whitePixel = 0;
+            //STEP 4: verify (again)
+            //there should be 788 white pixels in text image
+            for (int j = 0; j < graphics.getHeight(); j++) {
+                for (int i = 0; i < graphics.getWidth(); i++) {
+                    if (pixelCollection.getPixels()[i + j*(int)graphics.getWidth()] == -1) {
+                        whitePixel++;
+                    }
+                }
+            }
+            System.out.println("white pixel count: " + whitePixel);
+        }
     }
 
     public void fileInfo() throws IOException {
