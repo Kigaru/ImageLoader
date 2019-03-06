@@ -59,14 +59,14 @@ public class Controller {
                 isBlue = false;
                 isGreen = false;
                 fixCheckBoxes();
-                image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome));
+                image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome,false));
             } else {
                 isMonochrome = false;
                 isRed = true;
                 isBlue = true;
                 isGreen = true;
                 fixCheckBoxes();
-                image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome));
+                image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome,false));
             }
         }
         long after = System.nanoTime();
@@ -81,12 +81,12 @@ public class Controller {
         isGreen = greenCheck.isSelected();
         isBlue = blueCheck.isSelected();
         fixCheckBoxes();
-        image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome));
+        image.setImage(getModifiedImage(isRed,isGreen,isBlue,isMonochrome,false));
         long after = System.nanoTime();
         System.out.println("The time it took to toggle colors = " + (after - before) + " nanoseconds");
     }
 
-    private Image getModifiedImage(boolean red, boolean green, boolean blue, boolean mono) {
+    private Image getModifiedImage(boolean red, boolean green, boolean blue, boolean mono, boolean explicitMono) {
         if(graphics==null) return new WritableImage(1,1);
         else {
             WritableImage newImage = new WritableImage(graphicsPixelReader, (int) graphics.getWidth(), (int) graphics.getHeight());
@@ -117,12 +117,17 @@ public class Controller {
                     for (int x = 0; x < graphics.getHeight(); x++) {
                         Color color = graphicsPixelReader.getColor(y, x);
                         dmono = (color.getRed()+color.getGreen()+color.getBlue())/3;
+
+                        if(explicitMono) dmono = dmono > 0.5 ? 1 : 0;
+
                         Color grayscale = new Color(dmono,dmono,dmono,color.getOpacity());
                         newImagePixelWriter.setColor(y, x, grayscale);
                     }
                 }
-                
             }
+
+
+
             return newImage;
         }
     }
@@ -132,9 +137,9 @@ public class Controller {
         if (graphics!=null) {
             Stage channels = new Stage();
             HBox hbox = new HBox();   
-            ImageView red = new ImageView(getModifiedImage(true,false,false,false));
-            ImageView green = new ImageView(getModifiedImage(false,true,false,false));
-            ImageView blue = new ImageView(getModifiedImage(false,false,true,false));
+            ImageView red = new ImageView(getModifiedImage(true,false,false,false,false));
+            ImageView green = new ImageView(getModifiedImage(false,true,false,false,false));
+            ImageView blue = new ImageView(getModifiedImage(false,false,true,false,false));
 
 
             //screen-size Screen.getPrimary().getBounds().getMaxX();
@@ -193,18 +198,22 @@ public class Controller {
                     pixelCollection.setPixel(i,i);
                 }
 
-            //STEP 3: set all white pixels to -1
+            //STEP 3: saturate image accordingly
+            WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true,true);
+            image.setImage(saturatedImage);
+
+            //STEP 4: set all white pixels to -1
             for (int j = 0; j < graphics.getHeight(); j++) {
                 for (int i = 0; i < graphics.getWidth(); i++) {
-                    if (graphicsPixelReader.getColor(i,j).equals(Color.WHITE)) {
+                    if (saturatedImage.getPixelReader().getColor(i,j).equals(Color.WHITE)) {
                         pixelCollection.setPixel(i + j * (int)graphics.getWidth(),-1);
                     }
                 }
             }
 
-            int whitePixel = 0;
             //STEP 4: verify (again)
             //there should be 788 white pixels in text image
+            int whitePixel = 0;
             for (int j = 0; j < graphics.getHeight(); j++) {
                 for (int i = 0; i < graphics.getWidth(); i++) {
                     if (pixelCollection.getPixels()[i + j*(int)graphics.getWidth()] == -1) {
