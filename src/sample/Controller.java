@@ -207,11 +207,11 @@ public class Controller {
                 }
             }
 
-            //STEP 5: union all black pixels
+            //STEP 5: union all black pixels if necessary
             for (int j = 0; j < graphics.getHeight(); j++) {
                 for (int i = 0; i < graphics.getWidth(); i++) {
                     if (pixelCollection.getPixels()[i + j * (int) graphics.getWidth()] != -1) {
-                        if (!(i + 1 >= graphics.getWidth()) || !(j + 1 >= graphics.getHeight())) {
+                        if ((i + 1 < graphics.getWidth()) && (j + 1 < graphics.getHeight())) {
                             //to the right
                             if (saturatedImage.getPixelReader().getColor(i + 1, j).equals(Color.BLACK)) {
                                 DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + 1 + j * (int) graphics.getWidth());
@@ -225,7 +225,8 @@ public class Controller {
                                 DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i +1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
                             }
                         }
-                        if(i-1 != -1) {
+                        if(i-1 >= 0 && (j + 1 < graphics.getHeight())) {
+
                             //under left
                             if (saturatedImage.getPixelReader().getColor(-1 +i, j +1).equals(Color.BLACK)) {
                                 DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i - 1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
@@ -236,7 +237,7 @@ public class Controller {
             }
 
             //STEP 6: count all roots
-            int[] roots = new int[100];
+            int[] roots = new int[1000];
             for (int i = 0; i < roots.length; i++) {
                 roots[i] = -213;
             }
@@ -250,8 +251,8 @@ public class Controller {
                     }
                     if(isNewRoot) {
                         roots[counter] = DisjointSet.find(pixelCollection.getPixels(),j);
-                        System.out.println("x: "+ j%graphics.getWidth() + ", y: " + (j-j%graphics.getWidth())/graphics.getWidth());
-                        System.out.println(j);
+                        //System.out.println("x: "+ j%graphics.getWidth() + ", y: " + (j-j%graphics.getWidth())/graphics.getWidth());
+                        //System.out.println(j);
                         counter++;
                     }
                 }
