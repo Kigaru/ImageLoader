@@ -240,23 +240,21 @@ public class Controller {
             //??
 
             //STEP 7: count all roots
-            int[] roots = new int[1000];
-            for (int i = 0; i < roots.length; i++) {
-                roots[i] = -213;
-            }
-            int counter = 0;
+            LinkedList<Integer> roots = new LinkedList<>();
+
+            //int[] roots = new int[1000];
+
             for (int j = 0; j < pixelCollection.getPixels().length; j++) { //going thru all pixels
                 if(pixelCollection.getPixels()[j] >= 0) { //if black pixel
                     boolean isNewRoot = true;
-                    for (int i = 0; i < roots.length ; i++) {
-                        if(roots[i] == DisjointSet.find(pixelCollection.getPixels(),j)) isNewRoot = false;
+                    for (int i = 0; i < roots.size() ; i++) {
+                        if(roots.get(i) == DisjointSet.find(pixelCollection.getPixels(),j)) isNewRoot = false;
 
                     }
                     if(isNewRoot) {
-                        roots[counter] = DisjointSet.find(pixelCollection.getPixels(),j);
+                        roots.insertElement(DisjointSet.find(pixelCollection.getPixels(),j));
                         //System.out.println("x: "+ j%graphics.getWidth() + ", y: " + (j-j%graphics.getWidth())/graphics.getWidth());
                         //System.out.println(j);
-                        counter++;
                     }
                 }
             }
@@ -265,8 +263,9 @@ public class Controller {
 
             //STEP 8: draw boxes
 
+
             System.out.println("there are " + totalPixels + " black pixels");
-            System.out.println("there are " + counter+ " birds");
+            System.out.println("there are " + roots.size() + " birds");
 
 //            //STEP 4: verify (again)
 //            //there should be 788 white pixels in text image
