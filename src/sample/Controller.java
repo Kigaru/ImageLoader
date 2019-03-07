@@ -236,7 +236,10 @@ public class Controller {
                 }
             }
 
-            //STEP 6: count all roots
+            //STEP 6: noise reduction
+            //??
+
+            //STEP 7: count all roots
             int[] roots = new int[1000];
             for (int i = 0; i < roots.length; i++) {
                 roots[i] = -213;
@@ -258,8 +261,9 @@ public class Controller {
                 }
             }
 
-            //STEP 7: noise reduction
-            //??
+
+
+            //STEP 8: draw boxes
 
             System.out.println("there are " + totalPixels + " black pixels");
             System.out.println("there are " + counter+ " birds");
