@@ -26,6 +26,7 @@ public class Controller {
     private CheckMenuItem redCheck, greenCheck, blueCheck, monoCheck;
 
     private Image graphics;
+    private WritableImage imageWithBoxes;
     private PixelReader graphicsPixelReader;
     private File file; //to get size later
     private boolean isMonochrome = false, isRed = true, isGreen = true, isBlue = true;
@@ -180,6 +181,9 @@ public class Controller {
 
     public void test() {
         if (graphics != null) {
+            //for showing it at the end :)
+            imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
+
 
             //STEP 1: initialize
             PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
@@ -242,19 +246,17 @@ public class Controller {
             //STEP 7: count all roots
             LinkedList<Integer> roots = new LinkedList<>();
 
-            //int[] roots = new int[1000];
-
-            for (int j = 0; j < pixelCollection.getPixels().length; j++) { //going thru all pixels
-                if(pixelCollection.getPixels()[j] >= 0) { //if black pixel
+            for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) { //going thru all pixels
+                if(pixelCollection.getPixels()[pixel] >= 0) { //if black pixel
                     boolean isNewRoot = true;
                     for (int i = 0; i < roots.size() ; i++) {
-                        if(roots.get(i) == DisjointSet.find(pixelCollection.getPixels(),j)) isNewRoot = false;
+                        if(roots.get(i) == DisjointSet.find(pixelCollection.getPixels(),pixel)) isNewRoot = false;
 
                     }
                     if(isNewRoot) {
-                        roots.insertElement(DisjointSet.find(pixelCollection.getPixels(),j));
-                        //System.out.println("x: "+ j%graphics.getWidth() + ", y: " + (j-j%graphics.getWidth())/graphics.getWidth());
-                        //System.out.println(j);
+                        roots.insertLastElement(DisjointSet.find(pixelCollection.getPixels(),pixel));
+                        System.out.println("x: "+ roots.getLast()%graphics.getWidth() + ", y: " + (roots.getLast()-roots.getLast()%graphics.getWidth())/graphics.getWidth());
+                        System.out.println(roots.getLast());
                     }
                 }
             }
@@ -262,10 +264,31 @@ public class Controller {
 
 
             //STEP 8: draw boxes
+            for(int root = 0; root < roots.size(); root++) {
+                int minX, minY, maxX, maxY;
+                minX = (int)(roots.get(root)%graphics.getWidth());
+                maxX = (int)(roots.get(root)%graphics.getWidth());
+                minY = (int)((roots.get(root)-roots.getLast()%graphics.getWidth())/graphics.getWidth());
+                maxY = (int)((roots.get(root)-roots.getLast()%graphics.getWidth())/graphics.getWidth());
+                for(int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) {
+                    if(pixelCollection.getPixels()[pixel] != -1 && DisjointSet.find(pixelCollection.getPixels(),pixel) == roots.get(root) ) {
+                        minX =  pixel%graphics.getWidth() < minX  ? (int)(pixel%graphics.getWidth()) : minX;
+                        maxX =  pixel%graphics.getWidth() > maxX  ? (int)(pixel%graphics.getWidth()) : maxX;
+                        minY =  ((pixel-pixel%graphics.getWidth())/graphics.getWidth()) < minY  ? (int)((pixel-pixel%graphics.getWidth())/graphics.getWidth()) : minY;
+                        maxY =  ((pixel-pixel%graphics.getWidth())/graphics.getWidth()) > maxY  ? (int)((pixel-pixel%graphics.getWidth())/graphics.getWidth()) : maxY;
+                    }
+                }
+                drawBoxes(minX,minY,maxX,maxY);
+//                System.out.println("Root #" + (root+1)+", DRAW BOXES AT: ");
+//                System.out.println("X: " + minX + ", Y: " + minY);
+//                System.out.println("X: " + maxX + ", Y: " + maxY);
+
+            }
 
 
             System.out.println("there are " + totalPixels + " black pixels");
             System.out.println("there are " + roots.size() + " birds");
+            image.setImage(imageWithBoxes);
 
 //            //STEP 4: verify (again)
 //            //there should be 788 white pixels in text image
@@ -280,7 +303,23 @@ public class Controller {
         }
     }
 
-        public void fileInfo() throws IOException {
+    private void drawBoxes(int minX, int minY, int maxX, int maxY){
+        PixelWriter imageWithBoxesPW = imageWithBoxes.getPixelWriter();
+
+        for (int x = minX; x < maxX; x++) {
+            imageWithBoxesPW.setColor(x, minY, Color.RED);
+            imageWithBoxesPW.setColor(x, maxY, Color.RED);
+        }
+
+        for (int y = minY; y < maxY; y++) {
+            imageWithBoxesPW.setColor(minX, y, Color.RED);
+            imageWithBoxesPW.setColor(maxX, y, Color.RED);
+        }
+
+
+    }
+
+    public void fileInfo() throws IOException {
         Stage stage = new Stage();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("info.fxml"));
         Parent root = loader.load();
