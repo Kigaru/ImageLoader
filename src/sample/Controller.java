@@ -188,6 +188,9 @@ public class Controller {
 
     public void test() {
         if (graphics != null) {
+            long bench = System.nanoTime();
+
+
             //for showing it at the end :)
             imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
             birdInts = new StackPane();
@@ -195,16 +198,21 @@ public class Controller {
             //STEP 1: initialize
             PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
 
+            System.out.println("Initialization: " + (System.nanoTime() - bench));
+
             //STEP 2: populate
             for (int i = 0; i < pixelCollection.getPixels().length; i++) {
                 pixelCollection.setPixel(i, i);
             }
+
+            System.out.println("Population: " + (System.nanoTime() - bench));
 
             //STEP 3: saturate image accordingly
             WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true, true);
             image.setImage(saturatedImage);
 
 
+            System.out.println("Saturation: " + (System.nanoTime() - bench));
 
             int totalPixels = pixelCollection.getPixels().length;
 
@@ -217,6 +225,8 @@ public class Controller {
                     }
                 }
             }
+
+            System.out.println("Deleting whites: " + (System.nanoTime() - bench));
 
             //STEP 5: union all black pixels if necessary
             for (int j = 0; j < graphics.getHeight(); j++) {
@@ -247,6 +257,8 @@ public class Controller {
                 }
             }
 
+            System.out.println("Creating roots: " + (System.nanoTime() - bench));
+
             //STEP 6: noise reduction
             //??
 
@@ -268,7 +280,7 @@ public class Controller {
                 }
             }
 
-
+            System.out.println("counting roots: " + (System.nanoTime() - bench));
 
             //STEP 8: draw boxes
             for(int root = 0; root < roots.size(); root++) {
@@ -292,6 +304,8 @@ public class Controller {
 
             }
 
+
+            System.out.println("drawing boxes: " + (System.nanoTime() - bench));
 
             //System.out.println("there are " + totalPixels + " black pixels");
             //System.out.println("there are " + roots.size() + " birds");
