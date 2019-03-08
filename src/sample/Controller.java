@@ -2,11 +2,14 @@ package sample;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.image.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
@@ -25,12 +28,16 @@ public class Controller {
     @FXML
     private CheckMenuItem redCheck, greenCheck, blueCheck, monoCheck;
 
+    @FXML
+    private Pane imagePane;
+
     private Image graphics;
     private WritableImage imageWithBoxes;
     private PixelReader graphicsPixelReader;
     private File file; //to get size later
     private boolean isMonochrome = false, isRed = true, isGreen = true, isBlue = true;
 
+    private StackPane birdInts;
 
     public void openImage() {
         FileChooser fileChooser = new FileChooser();
@@ -183,7 +190,7 @@ public class Controller {
         if (graphics != null) {
             //for showing it at the end :)
             imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
-
+            birdInts = new StackPane();
 
             //STEP 1: initialize
             PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
@@ -255,8 +262,8 @@ public class Controller {
                     }
                     if(isNewRoot) {
                         roots.insertLastElement(DisjointSet.find(pixelCollection.getPixels(),pixel));
-                        System.out.println("x: "+ roots.getLast()%graphics.getWidth() + ", y: " + (roots.getLast()-roots.getLast()%graphics.getWidth())/graphics.getWidth());
-                        System.out.println(roots.getLast());
+                        //System.out.println("x: "+ roots.getLast()%graphics.getWidth() + ", y: " + (roots.getLast()-roots.getLast()%graphics.getWidth())/graphics.getWidth());
+                        //System.out.println(roots.getLast());
                     }
                 }
             }
@@ -278,7 +285,7 @@ public class Controller {
                         maxY =  ((pixel-pixel%graphics.getWidth())/graphics.getWidth()) > maxY  ? (int)((pixel-pixel%graphics.getWidth())/graphics.getWidth()) : maxY;
                     }
                 }
-                drawBoxes(minX,minY,maxX,maxY);
+                drawBox(minX,minY,maxX,maxY, root + 1);
 //                System.out.println("Root #" + (root+1)+", DRAW BOXES AT: ");
 //                System.out.println("X: " + minX + ", Y: " + minY);
 //                System.out.println("X: " + maxX + ", Y: " + maxY);
@@ -286,15 +293,15 @@ public class Controller {
             }
 
 
-            System.out.println("there are " + totalPixels + " black pixels");
-            System.out.println("there are " + roots.size() + " birds");
+            //System.out.println("there are " + totalPixels + " black pixels");
+            //System.out.println("there are " + roots.size() + " birds");
             image.setImage(imageWithBoxes);
 
 //            //STEP 4: verify (again)
 //            //there should be 788 white pixels in text image
 //            int whitePixel = 0;
 //            for (int j = 0; j < graphics.getHeight(); j++) {
-//                for (int i = 0; i < graphics.getWidth(); i++) {
+//                for (int i = 0; i < graphics.getWidth(); i++) {if
 //                    if (pixelCollection.getPixels()[i + j*(int)graphics.getWidth()] == -1) {
 //                        whitePixel++;
 //                    }
@@ -303,8 +310,26 @@ public class Controller {
         }
     }
 
-    private void drawBoxes(int minX, int minY, int maxX, int maxY){
+    private void drawBox(int minX, int minY, int maxX, int maxY, int number){
+
+
         PixelWriter imageWithBoxesPW = imageWithBoxes.getPixelWriter();
+
+        Label bird = new Label();
+        bird.setText(Integer.toString(number));
+        bird.setAlignment(Pos.TOP_RIGHT);
+        bird.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+        bird.setTextFill(Color.YELLOW);
+
+
+        //System.out.println("GET FIT WIDTH: " + image.maxWidth(640) + ", GET IMAGE WIDTH: " + graphics.getWidth());
+        //System.out.println("GET FIT HEIGHT: " + image.getFitHeight() + ", GET IMAGE HEIGHT: " + graphics.getHeight());
+
+        bird.setLayoutX(minX * (image.maxWidth(image.getFitWidth())/graphics.getWidth()));
+        bird.setLayoutY(minY * (image.maxHeight(image.getFitHeight())/graphics.getHeight()));
+        imagePane.getChildren().add(bird);
+
+
 
         for (int x = minX; x < maxX; x++) {
             imageWithBoxesPW.setColor(x, minY, Color.RED);
@@ -315,8 +340,6 @@ public class Controller {
             imageWithBoxesPW.setColor(minX, y, Color.RED);
             imageWithBoxesPW.setColor(maxX, y, Color.RED);
         }
-
-
     }
 
     public void fileInfo() throws IOException {
