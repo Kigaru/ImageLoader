@@ -37,24 +37,31 @@ public class Controller {
     private File file; //to get size later
     private boolean isMonochrome = false, isRed = true, isGreen = true, isBlue = true;
 
-    private StackPane birdInts;
+    private LinkedList<Label> birdLabels;
 
     public void openImage() {
+        System.out.println(birdLabels);
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose an image...");
         file = fileChooser.showOpenDialog(image.getScene().getWindow());
 
-        if(file != null) {
+        if (file != null) {
 
-            isMonochrome=false;
-            isRed=true;
-            isGreen=true;
-            isBlue=true;
-            fixCheckBoxes();
+            if (birdLabels != null) {
+                for (int i = 0; i < birdLabels.size(); i++) birdLabels.get(i).setVisible(false);
+                birdLabels.clear();
+            }
 
-            graphics = new Image(file.toURI().toString());
-            graphicsPixelReader = graphics.getPixelReader();
-            image.setImage(graphics);
+                isMonochrome = false;
+                isRed = true;
+                isGreen = true;
+                isBlue = true;
+                fixCheckBoxes();
+
+                graphics = new Image(file.toURI().toString());
+                graphicsPixelReader = graphics.getPixelReader();
+                image.setImage(graphics);
         }
     }
 
@@ -94,7 +101,7 @@ public class Controller {
             WritableImage newImage = new WritableImage(graphicsPixelReader, (int) graphics.getWidth(), (int) graphics.getHeight());
             PixelWriter newImagePixelWriter = newImage.getPixelWriter();
 
-            double dred, dgreen, dblue, dmono;
+            double dred, dgreen, dblue, dmono, dopacity;
 
             if(!mono) {
                 for (int x = 0; x < graphics.getWidth(); x++) {
@@ -119,16 +126,21 @@ public class Controller {
                     for (int y = 0; y < graphics.getHeight(); y++) {
                         Color color = graphicsPixelReader.getColor(x, y);
                         dmono = (color.getRed()+color.getGreen()+color.getBlue())/3;
+                        dopacity = color.getOpacity();
 
-                        if(explicitMono) dmono = dmono > 0.5 ? 1 : 0;
+                        if(explicitMono) {
+                            if(dopacity != 1) {
+                                dopacity = 1;
+                                dmono = 1;
+                            }
+                            dmono = dmono > 0.5 ? 1 : 0;
+                        }
 
-                        Color grayscale = new Color(dmono,dmono,dmono,color.getOpacity());
+                        Color grayscale = new Color(dmono,dmono,dmono,dopacity);
                         newImagePixelWriter.setColor(x, y, grayscale);
                     }
                 }
             }
-
-
 
             return newImage;
         }
@@ -192,7 +204,6 @@ public class Controller {
 
 
             imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
-            birdInts = new StackPane();
 
             //STEP 1: initialize
             PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
@@ -273,6 +284,9 @@ public class Controller {
             }
 
 
+            birdLabels = new LinkedList<>();
+
+
             //STEP 8: draw boxes
             for(int root = 0; root < roots.size(); root++) {
                 int minX, minY, maxX, maxY;
@@ -314,6 +328,7 @@ public class Controller {
         bird.setAlignment(Pos.TOP_RIGHT);
         bird.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         bird.setTextFill(Color.YELLOW);
+        birdLabels.insertLastElement(bird);
 
 
         //System.out.println("GET FIT WIDTH: " + image.maxWidth(640) + ", GET IMAGE WIDTH: " + graphics.getWidth());
