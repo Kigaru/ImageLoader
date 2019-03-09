@@ -40,18 +40,13 @@ public class Controller {
     private LinkedList<Label> birdLabels;
 
     public void openImage() {
-        System.out.println(birdLabels);
-
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose an image...");
         file = fileChooser.showOpenDialog(image.getScene().getWindow());
 
         if (file != null) {
 
-            if (birdLabels != null) {
-                for (int i = 0; i < birdLabels.size(); i++) birdLabels.get(i).setVisible(false);
-                birdLabels.clear();
-            }
+            clearBirdLabels();
 
                 isMonochrome = false;
                 isRed = true;
@@ -62,6 +57,13 @@ public class Controller {
                 graphics = new Image(file.toURI().toString());
                 graphicsPixelReader = graphics.getPixelReader();
                 image.setImage(graphics);
+        }
+    }
+
+    private void clearBirdLabels() {
+        if (birdLabels != null) {
+            for (int i = 0; i < birdLabels.size(); i++) birdLabels.get(i).setVisible(false);
+            birdLabels.clear();
         }
     }
 
@@ -200,7 +202,8 @@ public class Controller {
 
     public void test() {
         if (graphics != null) {
-//            long bench = System.nanoTime();
+            long bench = System.nanoTime();
+            clearBirdLabels();
 
 
             imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
@@ -221,7 +224,6 @@ public class Controller {
 
 
 
-//            int totalPixels = pixelCollection.getPixels().length;
 
 
             for (int j = 0; j < graphics.getHeight(); j++) {
@@ -230,7 +232,6 @@ public class Controller {
                     //STEP 4: set all white pixels to -1
                     if (saturatedImage.getPixelReader().getColor(i, j).equals(Color.WHITE)) {
                         pixelCollection.setPixel(i + j * (int) graphics.getWidth(), -1);
-//                        totalPixels--;
                     }
 
 
@@ -315,6 +316,7 @@ public class Controller {
             //System.out.println("there are " + roots.size() + " birds");
             image.setImage(imageWithBoxes);
 
+            System.out.println("it took: " + bench + " nanoseconds");
         }
     }
 
