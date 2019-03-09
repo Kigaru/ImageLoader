@@ -188,49 +188,42 @@ public class Controller {
 
     public void test() {
         if (graphics != null) {
-            long bench = System.nanoTime();
+//            long bench = System.nanoTime();
 
 
-            //for showing it at the end :)
             imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
             birdInts = new StackPane();
 
             //STEP 1: initialize
             PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
 
-            System.out.println("Initialization: " + (System.nanoTime() - bench));
 
             //STEP 2: populate
             for (int i = 0; i < pixelCollection.getPixels().length; i++) {
                 pixelCollection.setPixel(i, i);
             }
 
-            System.out.println("Population: " + (System.nanoTime() - bench));
 
             //STEP 3: saturate image accordingly
             WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true, true);
             image.setImage(saturatedImage);
 
 
-            System.out.println("Saturation: " + (System.nanoTime() - bench));
 
-            int totalPixels = pixelCollection.getPixels().length;
+//            int totalPixels = pixelCollection.getPixels().length;
 
-            //STEP 4: set all white pixels to -1
+
             for (int j = 0; j < graphics.getHeight(); j++) {
                 for (int i = 0; i < graphics.getWidth(); i++) {
+
+                    //STEP 4: set all white pixels to -1
                     if (saturatedImage.getPixelReader().getColor(i, j).equals(Color.WHITE)) {
                         pixelCollection.setPixel(i + j * (int) graphics.getWidth(), -1);
-                        totalPixels--;
+//                        totalPixels--;
                     }
-                }
-            }
 
-            System.out.println("Deleting whites: " + (System.nanoTime() - bench));
 
-            //STEP 5: union all black pixels if necessary
-            for (int j = 0; j < graphics.getHeight(); j++) {
-                for (int i = 0; i < graphics.getWidth(); i++) {
+                    //STEP 5: union all black pixels if necessary
                     if (pixelCollection.getPixels()[i + j * (int) graphics.getWidth()] != -1) {
                         if ((i + 1 < graphics.getWidth()) && (j + 1 < graphics.getHeight())) {
                             //to the right
@@ -257,7 +250,6 @@ public class Controller {
                 }
             }
 
-            System.out.println("Creating roots: " + (System.nanoTime() - bench));
 
             //STEP 6: noise reduction
             //??
@@ -280,7 +272,6 @@ public class Controller {
                 }
             }
 
-            System.out.println("counting roots: " + (System.nanoTime() - bench));
 
             //STEP 8: draw boxes
             for(int root = 0; root < roots.size(); root++) {
@@ -305,22 +296,11 @@ public class Controller {
             }
 
 
-            System.out.println("drawing boxes: " + (System.nanoTime() - bench));
 
             //System.out.println("there are " + totalPixels + " black pixels");
             //System.out.println("there are " + roots.size() + " birds");
             image.setImage(imageWithBoxes);
 
-//            //STEP 4: verify (again)
-//            //there should be 788 white pixels in text image
-//            int whitePixel = 0;
-//            for (int j = 0; j < graphics.getHeight(); j++) {
-//                for (int i = 0; i < graphics.getWidth(); i++) {if
-//                    if (pixelCollection.getPixels()[i + j*(int)graphics.getWidth()] == -1) {
-//                        whitePixel++;
-//                    }
-//                }
-//            }
         }
     }
 
