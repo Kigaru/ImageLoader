@@ -202,121 +202,117 @@ public class Controller {
 
     public void test() {
         if (graphics != null) {
-            long bench = System.nanoTime();
-            clearBirdLabels();
+                long bench = System.nanoTime();
+                clearBirdLabels();
 
 
-            imageWithBoxes = new WritableImage(graphics.getPixelReader(),(int)graphics.getWidth(),(int)graphics.getHeight());
+                imageWithBoxes = new WritableImage(graphics.getPixelReader(), (int) graphics.getWidth(), (int) graphics.getHeight());
 
-            //STEP 1: initialize
-            PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
-
-
-            //STEP 2: populate
-            for (int i = 0; i < pixelCollection.getPixels().length; i++) {
-                pixelCollection.setPixel(i, i);
-            }
+                //STEP 1: initialize
+                PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
 
 
-            //STEP 3: saturate image accordingly
-            WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true, true);
-            image.setImage(saturatedImage);
+                //STEP 2: populate
+                for (int i = 0; i < pixelCollection.getPixels().length; i++) {
+                    pixelCollection.setPixel(i, i);
+                }
 
 
+                //STEP 3: saturate image accordingly
+                WritableImage saturatedImage = (WritableImage) getModifiedImage(false, false, false, true, true);
+                image.setImage(saturatedImage);
 
 
+                for (int j = 0; j < graphics.getHeight(); j++) {
+                    for (int i = 0; i < graphics.getWidth(); i++) {
 
-            for (int j = 0; j < graphics.getHeight(); j++) {
-                for (int i = 0; i < graphics.getWidth(); i++) {
-
-                    //STEP 4: set all white pixels to -1
-                    if (saturatedImage.getPixelReader().getColor(i, j).equals(Color.WHITE)) {
-                        pixelCollection.setPixel(i + j * (int) graphics.getWidth(), -1);
-                    }
-
-
-                    //STEP 5: union all black pixels if necessary
-                    if (pixelCollection.getPixels()[i + j * (int) graphics.getWidth()] != -1) {
-                        if ((i + 1 < graphics.getWidth()) && (j + 1 < graphics.getHeight())) {
-                            //to the right
-                            if (saturatedImage.getPixelReader().getColor(i + 1, j).equals(Color.BLACK)) {
-                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + 1 + j * (int) graphics.getWidth());
-                            }
-                            //directly under
-                            if (saturatedImage.getPixelReader().getColor(i, j + 1).equals(Color.BLACK)) {
-                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + j * (int) graphics.getWidth() + (int) graphics.getWidth());
-                            }
-                            //under right
-                            if (saturatedImage.getPixelReader().getColor(i +1, j + 1).equals(Color.BLACK)) {
-                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i +1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
-                            }
+                        //STEP 4: set all white pixels to -1
+                        if (saturatedImage.getPixelReader().getColor(i, j).equals(Color.WHITE)) {
+                            pixelCollection.setPixel(i + j * (int) graphics.getWidth(), -1);
                         }
-                        if(i-1 >= 0 && (j + 1 < graphics.getHeight())) {
 
-                            //under left
-                            if (saturatedImage.getPixelReader().getColor(-1 +i, j +1).equals(Color.BLACK)) {
-                                DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i - 1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+
+                        //STEP 5: union all black pixels if necessary
+                        if (pixelCollection.getPixels()[i + j * (int) graphics.getWidth()] != -1) {
+                            if ((i + 1 < graphics.getWidth()) && (j + 1 < graphics.getHeight())) {
+                                //to the right
+                                if (saturatedImage.getPixelReader().getColor(i + 1, j).equals(Color.BLACK)) {
+                                    DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + 1 + j * (int) graphics.getWidth());
+                                }
+                                //directly under
+                                if (saturatedImage.getPixelReader().getColor(i, j + 1).equals(Color.BLACK)) {
+                                    DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+                                }
+                                //under right
+                                if (saturatedImage.getPixelReader().getColor(i + 1, j + 1).equals(Color.BLACK)) {
+                                    DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i + 1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+                                }
+                            }
+                            if (i - 1 >= 0 && (j + 1 < graphics.getHeight())) {
+
+                                //under left
+                                if (saturatedImage.getPixelReader().getColor(-1 + i, j + 1).equals(Color.BLACK)) {
+                                    DisjointSet.union(pixelCollection.getPixels(), i + j * (int) graphics.getWidth(), i - 1 + j * (int) graphics.getWidth() + (int) graphics.getWidth());
+                                }
                             }
                         }
                     }
                 }
-            }
 
 
-            //STEP 6: noise reduction
-            //??
+                //STEP 6: noise reduction
+                //??
 
-            //STEP 7: count all roots
-            LinkedList<Integer> roots = new LinkedList<>();
+                //STEP 7: count all roots
+                LinkedList<Integer> roots = new LinkedList<>();
 
-            for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) { //going thru all pixels
-                if(pixelCollection.getPixels()[pixel] >= 0) { //if black pixel
-                    boolean isNewRoot = true;
-                    for (int i = 0; i < roots.size() ; i++) {
-                        if(roots.get(i) == DisjointSet.find(pixelCollection.getPixels(),pixel)) isNewRoot = false;
+                for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) { //going thru all pixels
+                    if (pixelCollection.getPixels()[pixel] >= 0) { //if black pixel
+                        boolean isNewRoot = true;
+                        for (int i = 0; i < roots.size(); i++) {
+                            if (roots.get(i) == DisjointSet.find(pixelCollection.getPixels(), pixel)) isNewRoot = false;
 
-                    }
-                    if(isNewRoot) {
-                        roots.insertLastElement(DisjointSet.find(pixelCollection.getPixels(),pixel));
-                        //System.out.println("x: "+ roots.getLast()%graphics.getWidth() + ", y: " + (roots.getLast()-roots.getLast()%graphics.getWidth())/graphics.getWidth());
-                        //System.out.println(roots.getLast());
-                    }
-                }
-            }
-
-
-            birdLabels = new LinkedList<>();
-
-
-            //STEP 8: draw boxes
-            for(int root = 0; root < roots.size(); root++) {
-                int minX, minY, maxX, maxY;
-                minX = (int)(roots.get(root)%graphics.getWidth());
-                maxX = (int)(roots.get(root)%graphics.getWidth());
-                minY = (int)((roots.get(root)-roots.getLast()%graphics.getWidth())/graphics.getWidth());
-                maxY = (int)((roots.get(root)-roots.getLast()%graphics.getWidth())/graphics.getWidth());
-                for(int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) {
-                    if(pixelCollection.getPixels()[pixel] != -1 && DisjointSet.find(pixelCollection.getPixels(),pixel) == roots.get(root) ) {
-                        minX =  pixel%graphics.getWidth() < minX  ? (int)(pixel%graphics.getWidth()) : minX;
-                        maxX =  pixel%graphics.getWidth() > maxX  ? (int)(pixel%graphics.getWidth()) : maxX;
-                        minY =  ((pixel-pixel%graphics.getWidth())/graphics.getWidth()) < minY  ? (int)((pixel-pixel%graphics.getWidth())/graphics.getWidth()) : minY;
-                        maxY =  ((pixel-pixel%graphics.getWidth())/graphics.getWidth()) > maxY  ? (int)((pixel-pixel%graphics.getWidth())/graphics.getWidth()) : maxY;
+                        }
+                        if (isNewRoot) {
+                            roots.insertLastElement(DisjointSet.find(pixelCollection.getPixels(), pixel));
+                            //System.out.println("x: "+ roots.getLast()%graphics.getWidth() + ", y: " + (roots.getLast()-roots.getLast()%graphics.getWidth())/graphics.getWidth());
+                            //System.out.println(roots.getLast());
+                        }
                     }
                 }
-                drawBox(minX,minY,maxX,maxY, root + 1);
+
+
+                birdLabels = new LinkedList<>();
+
+
+                //STEP 8: draw boxes
+                for (int root = 0; root < roots.size(); root++) {
+                    int minX, minY, maxX, maxY;
+                    minX = (int) (roots.get(root) % graphics.getWidth());
+                    maxX = (int) (roots.get(root) % graphics.getWidth());
+                    minY = (int) ((roots.get(root) - roots.getLast() % graphics.getWidth()) / graphics.getWidth());
+                    maxY = (int) ((roots.get(root) - roots.getLast() % graphics.getWidth()) / graphics.getWidth());
+                    for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) {
+                        if (pixelCollection.getPixels()[pixel] != -1 && DisjointSet.find(pixelCollection.getPixels(), pixel) == roots.get(root)) {
+                            minX = pixel % graphics.getWidth() < minX ? (int) (pixel % graphics.getWidth()) : minX;
+                            maxX = pixel % graphics.getWidth() > maxX ? (int) (pixel % graphics.getWidth()) : maxX;
+                            minY = ((pixel - pixel % graphics.getWidth()) / graphics.getWidth()) < minY ? (int) ((pixel - pixel % graphics.getWidth()) / graphics.getWidth()) : minY;
+                            maxY = ((pixel - pixel % graphics.getWidth()) / graphics.getWidth()) > maxY ? (int) ((pixel - pixel % graphics.getWidth()) / graphics.getWidth()) : maxY;
+                        }
+                    }
+                    drawBox(minX, minY, maxX, maxY, root + 1);
 //                System.out.println("Root #" + (root+1)+", DRAW BOXES AT: ");
 //                System.out.println("X: " + minX + ", Y: " + minY);
 //                System.out.println("X: " + maxX + ", Y: " + maxY);
 
-            }
+                }
 
 
+                //System.out.println("there are " + totalPixels + " black pixels");
+                //System.out.println("there are " + roots.size() + " birds");
+                image.setImage(imageWithBoxes);
 
-            //System.out.println("there are " + totalPixels + " black pixels");
-            //System.out.println("there are " + roots.size() + " birds");
-            image.setImage(imageWithBoxes);
-
-            System.out.println("it took: " + bench + " nanoseconds");
+                System.out.println("it took: " + bench + " nanoseconds");
         }
     }
 
