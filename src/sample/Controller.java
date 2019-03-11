@@ -348,7 +348,7 @@ public class Controller {
                     maxX = (int) (rootValue % graphics.getWidth());
                     minY = (int) ((rootValue - rootValue % graphics.getWidth()) / graphics.getWidth()); // reveal the x coordinate, subtract from the xy, then divide by width to reveal y
                     maxY = (int) ((rootValue - rootValue % graphics.getWidth()) / graphics.getWidth());
-                    System.out.println("minX: " + minX + ", maxX" + maxX + "\nminY: " + minY + ", maxY" + maxY + "\n");
+                    //System.out.println("minX: " + minX + ", maxX" + maxX + "\nminY: " + minY + ", maxY" + maxY + "\n");
                     for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) {
                         if (pixelCollection.getPixels()[pixel] != -1 && DisjointSet.find(pixelCollection.getPixels(), pixel) == roots.get(root)) {
                             minX = pixel % graphics.getWidth() < minX ? (int) (pixel % graphics.getWidth()) : minX;
