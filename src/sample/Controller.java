@@ -342,11 +342,13 @@ public class Controller {
 
                 //STEP 7: draw boxes
                 for (int root = 0; root < roots.size(); root++) {
-                    int minX, minY, maxX, maxY;
-                    minX = (int) (roots.get(root) % graphics.getWidth());
-                    maxX = (int) (roots.get(root) % graphics.getWidth());
-                    minY = (int) ((roots.get(root) - roots.getLast() % graphics.getWidth()) / graphics.getWidth());
-                    maxY = (int) ((roots.get(root) - roots.getLast() % graphics.getWidth()) / graphics.getWidth());
+                    int minX, minY, maxX, maxY, rootValue;
+                    rootValue = roots.get(root);
+                    minX = (int) (rootValue % graphics.getWidth()); //mod width reveals the x coordinate
+                    maxX = (int) (rootValue % graphics.getWidth());
+                    minY = (int) ((rootValue - rootValue % graphics.getWidth()) / graphics.getWidth()); // reveal the x coordinate, subtract from the xy, then divide by width to reveal y
+                    maxY = (int) ((rootValue - rootValue % graphics.getWidth()) / graphics.getWidth());
+                    System.out.println("minX: " + minX + ", maxX" + maxX + "\nminY: " + minY + ", maxY" + maxY + "\n");
                     for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) {
                         if (pixelCollection.getPixels()[pixel] != -1 && DisjointSet.find(pixelCollection.getPixels(), pixel) == roots.get(root)) {
                             minX = pixel % graphics.getWidth() < minX ? (int) (pixel % graphics.getWidth()) : minX;
