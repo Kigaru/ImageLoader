@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<VBox prefHeight="484.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -25,7 +29,7 @@
                   <CheckMenuItem fx:id="greenCheck" mnemonicParsing="false" onAction="#toggleColor" selected="true" text="Toggle Green" />
                   <CheckMenuItem fx:id="blueCheck" mnemonicParsing="false" onAction="#toggleColor" selected="true" text="Toggle Blue" />
                   <MenuItem mnemonicParsing="false" onAction="#showAllChannels" text="Show All Channels" />
-                  <MenuItem mnemonicParsing="false" onAction="#test" text="Test" />
+                  <MenuItem mnemonicParsing="false" onAction="#test" text="Detect Birds" />
           </items>
         </Menu>
             <Menu mnemonicParsing="false" text="Help">
@@ -35,9 +39,17 @@
             </Menu>
       </menus>
     </MenuBar>
-      <Pane fx:id="imagePane" prefHeight="371.0" prefWidth="640.0">
+      <HBox prefHeight="33.0" prefWidth="640.0">
          <children>
-            <ImageView fx:id="image" fitHeight="370.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true" />
+            <Slider fx:id="thresholdSlider" prefHeight="28.0" prefWidth="321.0" value="50.0" />
+            <Label fx:id="thresholdLabel" prefHeight="28.0" prefWidth="39.0" text="50%" />
+            <Button mnemonicParsing="false" onAction="#previewPercentage" text="Update Percentage" />
+            <Button layoutX="359.0" layoutY="10.0" mnemonicParsing="false" onAction="#previewThreshold" text="Preview Threshold" />
+         </children>
+      </HBox>
+      <Pane fx:id="imagePane" prefHeight="391.0" prefWidth="640.0">
+         <children>
+            <ImageView fx:id="image" fitHeight="392.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </Pane>
   </children>

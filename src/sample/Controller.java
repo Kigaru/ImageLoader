@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -31,8 +32,15 @@ public class Controller {
     @FXML
     private Pane imagePane;
 
+    @FXML
+    private Slider thresholdSlider;
+    @FXML
+    private Label thresholdLabel;
+    private double threshold = 0.5;
+
     private Image graphics;
     private WritableImage imageWithBoxes;
+    private ImageView monoView;
     private PixelReader graphicsPixelReader;
     private File file; //to get size later
     private boolean isMonochrome = false, isRed = true, isGreen = true, isBlue = true;
@@ -135,7 +143,7 @@ public class Controller {
                                 dopacity = 1;
                                 dmono = 1;
                             }
-                            dmono = dmono > 0.5 ? 1 : 0;
+                            dmono = dmono > threshold ? 1 : 0;
                         }
 
                         Color grayscale = new Color(dmono,dmono,dmono,dopacity);
@@ -199,6 +207,45 @@ public class Controller {
         }
     }
 
+    public void previewThreshold() {
+        if (graphics != null) {
+            if (monoView == null) {
+                Stage thresholdStage = new Stage();
+                HBox hbox = new HBox();
+                monoView = new ImageView();
+
+
+                double x = graphics.getWidth();
+                double y = graphics.getHeight();
+                double width, height;
+
+                monoView.setFitWidth((int) (Screen.getPrimary().getBounds().getMaxX() * 0.8));
+                monoView.setFitHeight((int) (monoView.getFitWidth() * (y / x) * 0.8));
+
+
+                width = monoView.getFitWidth();
+                height = monoView.getFitHeight();
+
+
+                hbox.getChildren().addAll(monoView);
+                monoView.setImage(getModifiedImage(false, false, false, true, true));
+                thresholdStage.setScene(new Scene(hbox, width, height));
+                thresholdStage.setResizable(true);
+                thresholdStage.show();
+            }
+
+            else {
+                monoView.setImage(getModifiedImage(false, false, false, true, true));
+            }
+        }
+    }
+
+    public void previewPercentage() {
+        threshold = thresholdSlider.getValue()/100;
+        thresholdLabel.setText( (int)(threshold*100) + "%");
+        System.out.println( ((threshold) + "%"));
+
+    }
 
     public void test() {
         if (graphics != null) {
@@ -260,10 +307,8 @@ public class Controller {
                 }
 
 
-                //STEP 6: noise reduction
-                //??
 
-                //STEP 7: count all roots
+                //STEP 6: count all roots
                 LinkedList<Integer> roots = new LinkedList<>();
 
                 for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) { //going thru all pixels
@@ -285,7 +330,7 @@ public class Controller {
                 birdLabels = new LinkedList<>();
 
 
-                //STEP 8: draw boxes
+                //STEP 7: draw boxes
                 for (int root = 0; root < roots.size(); root++) {
                     int minX, minY, maxX, maxY;
                     minX = (int) (roots.get(root) % graphics.getWidth());

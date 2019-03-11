@@ -3,7 +3,7 @@ package sample;
 public class DisjointSet {
 
     public static int find(int[] array, int node) {
-        return array[node] == node ? node : find(array, array[node]); //TODO make path shorter with each go
+        return array[node] == node ? node : find(array, array[node]);
     }
 
     public static void union(int[] array, int parent, int child) {
