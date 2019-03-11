@@ -37,6 +37,7 @@ public class Controller {
     @FXML
     private Label thresholdLabel;
     private double threshold = 0.5;
+    private Stage thresholdStage;
 
     private Image graphics;
     private WritableImage imageWithBoxes;
@@ -210,7 +211,7 @@ public class Controller {
     public void previewThreshold() {
         if (graphics != null) {
             if (monoView == null) {
-                Stage thresholdStage = new Stage();
+                thresholdStage = new Stage();
                 HBox hbox = new HBox();
                 monoView = new ImageView();
 
@@ -219,9 +220,14 @@ public class Controller {
                 double y = graphics.getHeight();
                 double width, height;
 
-                monoView.setFitWidth((int) (Screen.getPrimary().getBounds().getMaxX() * 0.8));
-                monoView.setFitHeight((int) (monoView.getFitWidth() * (y / x) * 0.8));
-
+                if(x>y) {
+                    monoView.setFitWidth((int) (Screen.getPrimary().getBounds().getMaxX() * 0.4));
+                    monoView.setFitHeight((int) (monoView.getFitWidth() * (y / x)));
+                }
+                else {
+                    monoView.setFitHeight((int) (Screen.getPrimary().getBounds().getMaxY() * 0.8));
+                    monoView.setFitWidth((int) (monoView.getFitHeight() * (x / y)));
+                }
 
                 width = monoView.getFitWidth();
                 height = monoView.getFitHeight();
@@ -235,7 +241,11 @@ public class Controller {
             }
 
             else {
-                monoView.setImage(getModifiedImage(false, false, false, true, true));
+                if(!thresholdStage.isShowing()) {
+                    monoView = null;
+                    previewThreshold();
+                }
+                else monoView.setImage(getModifiedImage(false, false, false, true, true));
             }
         }
     }
