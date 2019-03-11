@@ -29,7 +29,7 @@
                   <CheckMenuItem fx:id="greenCheck" mnemonicParsing="false" onAction="#toggleColor" selected="true" text="Toggle Green" />
                   <CheckMenuItem fx:id="blueCheck" mnemonicParsing="false" onAction="#toggleColor" selected="true" text="Toggle Blue" />
                   <MenuItem mnemonicParsing="false" onAction="#showAllChannels" text="Show All Channels" />
-                  <MenuItem mnemonicParsing="false" onAction="#test" text="Detect Birds" />
+                  <MenuItem mnemonicParsing="false" onAction="#detectBirds" text="Detect Birds" />
           </items>
         </Menu>
             <Menu mnemonicParsing="false" text="Help">

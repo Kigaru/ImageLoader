@@ -243,13 +243,13 @@ public class Controller {
     public void previewPercentage() {
         threshold = thresholdSlider.getValue()/100;
         thresholdLabel.setText( (int)(threshold*100) + "%");
-        System.out.println( ((threshold) + "%"));
+        //System.out.println( ((threshold) + "%"));
 
     }
 
-    public void test() {
+    public void detectBirds() {
         if (graphics != null) {
-                long bench = System.nanoTime();
+                //long bench = System.nanoTime();
                 clearBirdLabels();
 
 
@@ -357,7 +357,7 @@ public class Controller {
                 //System.out.println("there are " + roots.size() + " birds");
                 image.setImage(imageWithBoxes);
 
-                System.out.println("it took: " + bench + " nanoseconds");
+                //System.out.println("it took: " + bench + " nanoseconds");
         }
     }
 
