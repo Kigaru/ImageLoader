@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 
 
@@ -264,7 +265,8 @@ public class Controller {
 
 
                 imageWithBoxes = new WritableImage(graphics.getPixelReader(), (int) graphics.getWidth(), (int) graphics.getHeight());
-
+                int blackPixels = (int)graphics.getWidth() * (int)graphics.getHeight();
+                
                 //STEP 1: initialize
                 PixelCollection pixelCollection = new PixelCollection((int) graphics.getWidth(), (int) graphics.getHeight());
 
@@ -286,6 +288,7 @@ public class Controller {
                         //STEP 4: set all white pixels to -1
                         if (saturatedImage.getPixelReader().getColor(i, j).equals(Color.WHITE)) {
                             pixelCollection.setPixel(i + j * (int) graphics.getWidth(), -1);
+                            blackPixels--;
                         }
 
 
@@ -320,20 +323,36 @@ public class Controller {
 
                 //STEP 6: count all roots
                 LinkedList<Integer> roots = new LinkedList<>();
+                LinkedList<Integer> rootSizes = new LinkedList<>();
+                
 
                 for (int pixel = 0; pixel < pixelCollection.getPixels().length; pixel++) { //going thru all pixels
                     if (pixelCollection.getPixels()[pixel] >= 0) { //if black pixel
                         boolean isNewRoot = true;
                         for (int i = 0; i < roots.size(); i++) {
-                            if (roots.get(i) == DisjointSet.find(pixelCollection.getPixels(), pixel)) isNewRoot = false;
-
+                            if (roots.get(i) == DisjointSet.find(pixelCollection.getPixels(), pixel)) {
+                            	isNewRoot = false;
+                            	rootSizes.set(i, rootSizes.get(i) + 1);
+                            	}
                         }
                         if (isNewRoot) {
-                            roots.insertLastElement(DisjointSet.find(pixelCollection.getPixels(), pixel));
+                            roots.addLast(DisjointSet.find(pixelCollection.getPixels(), pixel));
+                            rootSizes.addLast(1);
                             //System.out.println("x: "+ roots.getLast()%graphics.getWidth() + ", y: " + (roots.getLast()-roots.getLast()%graphics.getWidth())/graphics.getWidth());
                             //System.out.println(roots.getLast());
                         }
                     }
+                }
+                
+                //step 6.1 noise reduction
+                int noiseThreshold = blackPixels / rootSizes.size();
+                
+                for(int index = 0; index < rootSizes.size(); index++) {
+                	if(rootSizes.get(index) < noiseThreshold*0.5) {
+                		rootSizes.remove(index);
+                		roots.remove(index);
+                		index--;
+                	}              	
                 }
 
 
@@ -383,7 +402,7 @@ public class Controller {
         bird.setAlignment(Pos.TOP_RIGHT);
         bird.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         bird.setTextFill(Color.YELLOW);
-        birdLabels.insertLastElement(bird);
+        birdLabels.addLast(bird);
 
 
         //System.out.println("GET FIT WIDTH: " + image.maxWidth(640) + ", GET IMAGE WIDTH: " + graphics.getWidth());
