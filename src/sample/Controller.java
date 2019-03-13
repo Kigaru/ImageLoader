@@ -15,6 +15,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import utilities.DisjointSet;
+import utilities.PixelCollection;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +74,7 @@ public class Controller {
 
     private void clearBirdLabels() {
         if (birdLabels != null) {
-            for (int i = 0; i < birdLabels.size(); i++) birdLabels.get(i).setVisible(false);
+            for (Label birdLabel : birdLabels) birdLabel.setVisible(false);
             birdLabels.clear();
         }
     }

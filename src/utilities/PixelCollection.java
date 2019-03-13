@@ -1,4 +1,4 @@
-package sample;
+package utilities;
 
 public class PixelCollection {
 
